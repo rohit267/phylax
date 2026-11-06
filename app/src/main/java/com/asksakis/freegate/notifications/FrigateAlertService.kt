@@ -385,6 +385,7 @@ class FrigateAlertService : Service() {
         // it loads the Frigate config. Presence (> 0) tells the filter the
         // empty allowlist means "explicit deselect all" rather than legacy
         // "never touched", so we don't silently mute upgraded users.
+        val outside = outsideModeOn()
         return AlertFilter(
             allowAlerts = prefs.getBoolean("notify_alerts", true),
             allowDetections = prefs.getBoolean("notify_detections", false),
@@ -393,7 +394,18 @@ class FrigateAlertService : Service() {
             zoneAllowlist = zones,
             zonePickerOpened = prefs.getInt("notify_zones_total", 0) > 0,
             listeningSinceSec = if (listeningSinceMs > 0L) listeningSinceMs / 1000.0 else 0.0,
+            alwaysZonePattern = if (outside) alwaysZonePattern() else null,
+            muteNonAlwaysZones = outside && networkUtils.isInternal.value == true,
         )
+    }
+
+    private fun outsideModeOn() = prefs.getBoolean("notifications_outside_mode", false)
+
+    // A bad regex falls back to a literal match so a typo never mutes the gate.
+    private fun alwaysZonePattern(): Regex {
+        val raw = prefs.getString("notify_always_zone_pattern", null).orEmpty().ifBlank { "gate" }
+        return runCatching { Regex(raw, RegexOption.IGNORE_CASE) }
+            .getOrElse { Regex(Regex.escape(raw), RegexOption.IGNORE_CASE) }
     }
 
     /**
@@ -415,7 +427,9 @@ class FrigateAlertService : Service() {
         // drops it below — it's still "seen", so catch-up shouldn't re-fetch it.
         alert.startTimeSec?.let { advanceReviewWatermark(it) }
 
-        if (prefs.getBoolean("notifications_external_only", false) && networkUtils.isInternal.value == true) {
+        if (prefs.getBoolean("notifications_external_only", false) && !outsideModeOn() &&
+            networkUtils.isInternal.value == true
+        ) {
             Log.d(TAG, "  -> skipped (external only mode)")
             return false
         }

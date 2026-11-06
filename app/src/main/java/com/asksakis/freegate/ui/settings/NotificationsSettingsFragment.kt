@@ -101,6 +101,8 @@ class NotificationsSettingsFragment : PreferenceFragmentCompat() {
         "notify_detections",
         "notify_cameras",
         "notify_zones",
+        "notifications_outside_mode",
+        "notify_always_zone_pattern",
     )
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

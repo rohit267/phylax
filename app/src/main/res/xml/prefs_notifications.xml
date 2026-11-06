@@ -88,6 +88,22 @@
             android:defaultValue="false"
             android:dependency="notifications_enabled" />
 
+        <SwitchPreferenceCompat
+            android:key="notifications_outside_mode"
+            android:icon="@drawable/ic_notif_zone"
+            android:title="Outside mode"
+            android:summary="Zones matching the pattern below always notify. On home Wi-Fi everything else is muted; outside you get everything. Replaces “Only on external URL”."
+            android:defaultValue="false"
+            android:dependency="notifications_enabled" />
+
+        <EditTextPreference
+            android:key="notify_always_zone_pattern"
+            android:icon="@drawable/ic_notif_zone"
+            android:title="Always-notify zone pattern"
+            android:defaultValue="gate"
+            android:dependency="notifications_outside_mode"
+            app:useSimpleSummaryProvider="true" />
+
         <ListPreference
             android:key="notify_tap_action"
             android:icon="@drawable/ic_notif_tap"

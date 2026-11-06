@@ -103,6 +103,10 @@ android {
         viewBinding = true
         buildConfig = true
     }
+    testOptions {
+        // AlertFilter logs through android.util.Log; return defaults on the JVM.
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 androidComponents {
@@ -143,6 +147,8 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     
     testImplementation(libs.junit)
+    // Real org.json on the JVM (the android.jar one is a stub in unit tests).
+    testImplementation("org.json:json:20240303")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

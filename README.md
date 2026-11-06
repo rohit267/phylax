@@ -153,6 +153,7 @@ The background `FrigateAlertService` keeps a `wss://.../ws` connection open and 
 - **Reliable wake-up.** Alerts ring through Do Not Disturb at alarm volume even on Samsung One UI's vibrate ringer mode, routed via `STREAM_ALARM`. Music ducks (lowers volume briefly) instead of pausing.
 - **Custom bundled tones** (CC0) registered with MediaStore as **Phylax Alert** / **Phylax Chime** so they show up by name in the system sound picker — switchable from Settings → Notifications → Sounds.
 - **Only on external URL.** Turn notifications off automatically while you are on your home Wi-Fi.
+- **Outside mode** (fork addition). Reviews in a zone whose name matches a pattern (default `gate`, case-insensitive regex, so `gate`, `eastgate` and `EastGate` all match) always notify. While you are on your home Wi-Fi every other review is muted; outside you get everything your other filters allow. Turn it on under **Settings → Notifications → Behavior**. It replaces *Only on external URL* while on, and it needs the zones to exist in your Frigate config, since the zone names come from Frigate's review data.
 
 ### Motion notifications
 

@@ -33,6 +33,10 @@ class AlertFilter(
      * the gate.
      */
     private val listeningSinceSec: Double = 0.0,
+    /** Outside mode: a review in a zone matching this always notifies. Null = mode off. */
+    private val alwaysZonePattern: Regex? = null,
+    /** Outside mode while at home: zones not matching [alwaysZonePattern] are muted. */
+    private val muteNonAlwaysZones: Boolean = false,
 ) {
 
     /**
@@ -171,6 +175,8 @@ class AlertFilter(
     }
 
     private fun zonesMatchAllowlist(camera: String, zones: List<String>): Boolean {
+        if (alwaysZonePattern != null && zones.any { alwaysZonePattern.containsMatchIn(it) }) return true
+        if (muteNonAlwaysZones) return false
         if (zoneAllowlist.isEmpty()) {
             // Empty AFTER explicit deselection means "mute every zone-capable
             // review"; empty because the user has never touched the picker is

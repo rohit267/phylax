@@ -56,6 +56,7 @@ class NotificationsSettingsFragment : PreferenceFragmentCompat() {
             // severities, enable toggle), reset the cutoff so trackers from *before*
             // the change are filtered out — otherwise the user gets a retroactive
             // notification for an object Frigate has been tracking for hours.
+            if (key == "notifications_outside_mode") refreshOutsideStatus()
             if (key in configChangeKeys) {
                 FrigateAlertService.markListeningSince(requireContext())
             }
@@ -124,8 +125,25 @@ class NotificationsSettingsFragment : PreferenceFragmentCompat() {
         setupSoundPreferences()
     }
 
+    override fun onViewCreated(view: android.view.View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        networkUtils.isInternal.observe(viewLifecycleOwner) { refreshOutsideStatus() }
+    }
+
+    // Outside mode is a state, not a switch: ON whenever you are off the home network.
+    private fun refreshOutsideStatus() {
+        val pref = findPreference<Preference>("outside_mode_status") ?: return
+        val quiet = preferenceManager.sharedPreferences?.getBoolean("notifications_outside_mode", true) ?: true
+        pref.summary = when (networkUtils.isInternal.value) {
+            false -> "ON: you are outside, everything notifies"
+            true -> if (quiet) "OFF: you are at home, only gate zones notify" else "OFF: you are at home"
+            null -> "Detecting network…"
+        }
+    }
+
     override fun onResume() {
         super.onResume()
+        refreshOutsideStatus()
         // Child pickers (Cameras / Zones) write prefs directly — when the user backs
         // out, rebind the summaries here so the parent screen isn't stale.
         refreshFilterSummaries()

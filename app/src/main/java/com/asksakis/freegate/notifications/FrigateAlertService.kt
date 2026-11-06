@@ -399,7 +399,7 @@ class FrigateAlertService : Service() {
         )
     }
 
-    private fun outsideModeOn() = prefs.getBoolean("notifications_outside_mode", false)
+    private fun outsideModeOn() = prefs.getBoolean("notifications_outside_mode", true)
 
     // A bad regex falls back to a literal match so a typo never mutes the gate.
     private fun alwaysZonePattern(): Regex {

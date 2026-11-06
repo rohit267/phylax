@@ -88,12 +88,20 @@
             android:defaultValue="false"
             android:dependency="notifications_enabled" />
 
+        <Preference
+            android:key="outside_mode_status"
+            android:icon="@drawable/ic_conn_external"
+            android:title="Outside mode"
+            android:summary="Detecting network…"
+            android:selectable="false"
+            android:dependency="notifications_enabled" />
+
         <SwitchPreferenceCompat
             android:key="notifications_outside_mode"
             android:icon="@drawable/ic_notif_zone"
-            android:title="Outside mode"
-            android:summary="Zones matching the pattern below always notify. On home Wi-Fi everything else is muted; outside you get everything. Replaces “Only on external URL”."
-            android:defaultValue="false"
+            android:title="Quiet at home"
+            android:summary="On home Wi-Fi only zones matching the pattern below notify (for example the gate). Outside mode, you get everything. Replaces “Only on external URL”."
+            android:defaultValue="true"
             android:dependency="notifications_enabled" />
 
         <EditTextPreference

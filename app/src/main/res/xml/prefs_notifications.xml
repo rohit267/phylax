@@ -100,7 +100,7 @@
             android:key="notifications_outside_mode"
             android:icon="@drawable/ic_notif_zone"
             android:title="Quiet at home"
-            android:summary="On home Wi-Fi only zones matching the pattern below notify (for example the gate). Outside mode, you get everything. Replaces “Only on external URL”."
+            android:summary="On home Wi-Fi only zones matching the pattern below notify (for example the gate), and only during the home hours below; at home outside those hours nothing notifies. Outside mode, you get everything. Replaces “Only on external URL”."
             android:defaultValue="true"
             android:dependency="notifications_enabled" />
 
@@ -109,6 +109,15 @@
             android:icon="@drawable/ic_notif_zone"
             android:title="Always-notify zone pattern"
             android:defaultValue="gate"
+            android:dependency="notifications_outside_mode"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            android:key="notify_home_hours"
+            android:icon="@drawable/ic_notif_zone"
+            android:title="Home hours"
+            android:dialogTitle="Home hours, HH:mm-HH:mm (blank = all day)"
+            android:defaultValue="22:00-07:00"
             android:dependency="notifications_outside_mode"
             app:useSimpleSummaryProvider="true" />
 

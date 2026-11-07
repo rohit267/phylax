@@ -386,6 +386,8 @@ class FrigateAlertService : Service() {
         // empty allowlist means "explicit deselect all" rather than legacy
         // "never touched", so we don't silently mute upgraded users.
         val outside = outsideModeOn()
+        val atHome = outside && networkUtils.isInternal.value == true
+        val homeHours = prefs.getString("notify_home_hours", HomeHours.DEFAULT).orEmpty()
         return AlertFilter(
             allowAlerts = prefs.getBoolean("notify_alerts", true),
             allowDetections = prefs.getBoolean("notify_detections", false),
@@ -395,7 +397,8 @@ class FrigateAlertService : Service() {
             zonePickerOpened = prefs.getInt("notify_zones_total", 0) > 0,
             listeningSinceSec = if (listeningSinceMs > 0L) listeningSinceMs / 1000.0 else 0.0,
             alwaysZonePattern = if (outside) alwaysZonePattern() else null,
-            muteNonAlwaysZones = outside && networkUtils.isInternal.value == true,
+            muteNonAlwaysZones = atHome,
+            muteAllZones = atHome && !HomeHours.isActive(homeHours, java.time.LocalTime.now()),
         )
     }
 

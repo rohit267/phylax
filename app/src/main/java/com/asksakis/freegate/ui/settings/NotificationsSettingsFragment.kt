@@ -28,6 +28,7 @@ import com.asksakis.freegate.notifications.DetectionSoundPlayer
 import com.asksakis.freegate.notifications.FrigateAlertService
 import com.asksakis.freegate.notifications.FrigateConfigFetcher
 import com.asksakis.freegate.notifications.FrigateNotifier
+import com.asksakis.freegate.notifications.HomeHours
 import com.asksakis.freegate.notifications.MotionSoundPlayer
 import kotlinx.coroutines.Dispatchers
 import com.asksakis.freegate.notifications.OemSettingsIntents
@@ -56,7 +57,7 @@ class NotificationsSettingsFragment : PreferenceFragmentCompat() {
             // severities, enable toggle), reset the cutoff so trackers from *before*
             // the change are filtered out — otherwise the user gets a retroactive
             // notification for an object Frigate has been tracking for hours.
-            if (key == "notifications_outside_mode") refreshOutsideStatus()
+            if (key == "notifications_outside_mode" || key == "notify_home_hours") refreshOutsideStatus()
             if (key in configChangeKeys) {
                 FrigateAlertService.markListeningSince(requireContext())
             }
@@ -104,6 +105,7 @@ class NotificationsSettingsFragment : PreferenceFragmentCompat() {
         "notify_zones",
         "notifications_outside_mode",
         "notify_always_zone_pattern",
+        "notify_home_hours",
     )
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -134,9 +136,14 @@ class NotificationsSettingsFragment : PreferenceFragmentCompat() {
     private fun refreshOutsideStatus() {
         val pref = findPreference<Preference>("outside_mode_status") ?: return
         val quiet = preferenceManager.sharedPreferences?.getBoolean("notifications_outside_mode", true) ?: true
+        val hours = preferenceManager.sharedPreferences?.getString("notify_home_hours", HomeHours.DEFAULT).orEmpty()
         pref.summary = when (networkUtils.isInternal.value) {
             false -> "ON: you are outside, everything notifies"
-            true -> if (quiet) "OFF: you are at home, only gate zones notify" else "OFF: you are at home"
+            true -> when {
+                !quiet -> "OFF: you are at home"
+                HomeHours.isActive(hours, java.time.LocalTime.now()) -> "OFF: you are at home, only gate zones notify"
+                else -> "OFF: you are at home, quiet until ${HomeHours.startText(hours) ?: "night"}"
+            }
             null -> "Detecting network…"
         }
     }

@@ -37,6 +37,8 @@ class AlertFilter(
     private val alwaysZonePattern: Regex? = null,
     /** Outside mode while at home: zones not matching [alwaysZonePattern] are muted. */
     private val muteNonAlwaysZones: Boolean = false,
+    /** Outside mode at home outside the home hours: nothing notifies, gate zones included. */
+    private val muteAllZones: Boolean = false,
 ) {
 
     /**
@@ -177,6 +179,7 @@ class AlertFilter(
     private fun zonesMatchAllowlist(camera: String, zones: List<String>): Boolean {
         // Outside mode owns the zone rules, so the zone picker is ignored while it is on.
         if (alwaysZonePattern != null) {
+            if (muteAllZones) return false
             return !muteNonAlwaysZones || zones.any { alwaysZonePattern.containsMatchIn(it) }
         }
         if (zoneAllowlist.isEmpty()) {

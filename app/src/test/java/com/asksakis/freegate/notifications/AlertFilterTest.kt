@@ -21,6 +21,7 @@ class AlertFilterTest {
         pattern: Regex? = gate,
         muteOthers: Boolean,
         zoneAllowlist: Set<String> = emptySet(),
+        muteAll: Boolean = false,
     ) = AlertFilter(
         allowAlerts = true,
         allowDetections = false,
@@ -29,6 +30,7 @@ class AlertFilterTest {
         zonePickerOpened = zoneAllowlist.isNotEmpty(),
         alwaysZonePattern = pattern,
         muteNonAlwaysZones = muteOthers,
+        muteAllZones = muteAll,
     )
 
     private fun pass(f: AlertFilter, camera: String, vararg zones: String) =
@@ -80,6 +82,13 @@ class AlertFilterTest {
         val f = filter(pattern = null, muteOthers = false, zoneAllowlist = setOf("Front:yard"))
         pass(f, "Front", "yard")
         drop(f, "Front", "porch")
+    }
+
+    @Test fun atHomeOutsideNightHours_nothingNotifies() {
+        val f = filter(muteOthers = true, muteAll = true)
+        drop(f, "Front", "gate")
+        drop(f, "East", "eastgate")
+        drop(f, "Front", "yard")
     }
 
     @Test fun modeOff_behavesLikeBefore() {

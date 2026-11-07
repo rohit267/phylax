@@ -175,8 +175,10 @@ class AlertFilter(
     }
 
     private fun zonesMatchAllowlist(camera: String, zones: List<String>): Boolean {
-        if (alwaysZonePattern != null && zones.any { alwaysZonePattern.containsMatchIn(it) }) return true
-        if (muteNonAlwaysZones) return false
+        // Outside mode owns the zone rules, so the zone picker is ignored while it is on.
+        if (alwaysZonePattern != null) {
+            return !muteNonAlwaysZones || zones.any { alwaysZonePattern.containsMatchIn(it) }
+        }
         if (zoneAllowlist.isEmpty()) {
             // Empty AFTER explicit deselection means "mute every zone-capable
             // review"; empty because the user has never touched the picker is

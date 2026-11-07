@@ -62,9 +62,22 @@ class AlertFilterTest {
         pass(f, "Front")
     }
 
-    @Test fun gateZoneBypassesTheZonePicker() {
+    @Test fun outside_zonePickerIsIgnored() {
         val f = filter(muteOthers = false, zoneAllowlist = setOf("Front:yard"))
         pass(f, "Front", "gate")
+        pass(f, "Front", "yard")
+        pass(f, "Front", "porch")
+        pass(f, "Front")
+    }
+
+    @Test fun atHome_zonePickerIsIgnoredToo() {
+        val f = filter(muteOthers = true, zoneAllowlist = setOf("Front:yard"))
+        pass(f, "Front", "gate")
+        drop(f, "Front", "yard")
+    }
+
+    @Test fun modeOff_zonePickerStillApplies() {
+        val f = filter(pattern = null, muteOthers = false, zoneAllowlist = setOf("Front:yard"))
         pass(f, "Front", "yard")
         drop(f, "Front", "porch")
     }
